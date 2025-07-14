@@ -51,10 +51,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      // Busca usuário na API
-      const users = await apiGet(`/users?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-      if (users && users.length > 0) {
-        const userData = users[0];
+      let users;
+      
+      // Tenta primeiro a função serverless (produção)
+      try {
+        const response = await fetch('/api/getData');
+        if (response.ok) {
+          const json = await response.json();
+          users = json.users; // Acessa a propriedade users do objeto
+        } else {
+          throw new Error('Serverless function not available');
+        }
+      } catch (error) {
+        // Fallback para ambiente local (JSON Server)
+        console.log('Usando JSON Server local para autenticação...');
+        users = await apiGet(`/users?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+      }
+      
+      // Filtra o usuário correto
+      const userData = users.find((user: any) => 
+        user.email === email && user.password === password
+      );
+      
+      if (userData) {
         localStorage.setItem('coursesphere_token', 'demo-token');
         localStorage.setItem('coursesphere_user', JSON.stringify(userData));
         setUser(userData);
@@ -62,6 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       return false;
     } catch (error) {
+      console.error('Erro no login:', error);
       return false;
     } finally {
       setIsLoading(false);
