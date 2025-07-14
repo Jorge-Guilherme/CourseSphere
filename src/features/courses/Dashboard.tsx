@@ -30,34 +30,49 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadCourses();
-  }, []);
+    const loadCourses = async () => {
+      try {
+        setIsLoading(true);
+        let coursesData;
+        
+        // Tenta primeiro a função serverless (produção)
+        try {
+          const response = await fetch('/api/getData');
+          if (response.ok) {
+            const json = await response.json();
+            coursesData = json.courses; // Acessa a propriedade courses do objeto
+          } else {
+            throw new Error('Serverless function not available');
+          }
+        } catch (error) {
+          // Fallback para ambiente local (JSON Server)
+          console.log('Usando JSON Server local...');
+          const allCourses = await apiGet('/courses');
+          const userCourses = allCourses.filter((course: Course) =>
+            course.creator_id === user?.id || course.instructors.includes(user?.id || '')
+          );
+          const coursesWithLessons = await Promise.all(userCourses.map(async (course: Course) => {
+            const lessons = await apiGet(`/lessons?course_id=${course.id}`);
+            return { ...course, lessons_count: lessons.length };
+          }));
+          coursesData = coursesWithLessons;
+        }
+        
+        setCourses(coursesData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Erro ao carregar cursos:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os cursos",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+      }
+    };
 
-  const loadCourses = async () => {
-    try {
-      setIsLoading(true);
-      // Buscar cursos da API
-      const allCourses: Course[] = await apiGet('/courses');
-      // Filtrar cursos do usuário
-      const userCourses = allCourses.filter(course =>
-        course.creator_id === user?.id || course.instructors.includes(user?.id || '')
-      );
-      // Buscar contagem de aulas para cada curso
-      const coursesWithLessons = await Promise.all(userCourses.map(async (course) => {
-        const lessons = await apiGet(`/lessons?course_id=${course.id}`);
-        return { ...course, lessons_count: lessons.length };
-      }));
-      setCourses(coursesWithLessons);
-      setIsLoading(false);
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os cursos",
-        variant: "destructive"
-      });
-      setIsLoading(false);
-    }
-  };
+    loadCourses();
+  }, [user?.id]);
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

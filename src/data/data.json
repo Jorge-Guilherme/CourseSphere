@@ -1,0 +1,88 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin User",
+      "email": "admin@coursesphere.com",
+      "password": "123456"
+    },
+    {
+      "id": "2",
+      "name": "Instrutor 2",
+      "email": "instrutor2@coursesphere.com",
+      "password": "abcdef"
+    },
+    {
+      "id": "3",
+      "name": "Estudante 1",
+      "email": "estudante1@coursesphere.com",
+      "password": "654321"
+    }
+  ],
+  "courses": [
+    {
+      "id": "1",
+      "name": "React Avançado",
+      "description": "Curso completo de React com Hooks, Context API e TypeScript.",
+      "start_date": "2024-01-15",
+      "end_date": "2025-10-15",
+      "creator_id": "1",
+      "instructors": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Node.js e APIs REST",
+      "description": "Desenvolvimento de APIs REST com Node.js, Express e MongoDB.",
+      "start_date": "2025-12-31",
+      "end_date": "2026-12-31",
+      "creator_id": "1",
+      "instructors": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "id": "123",
+      "name": "Teste api",
+      "description": "Teste",
+      "start_date": "2024-01-01",
+      "end_date": "2024-12-31",
+      "creator_id": "1",
+      "instructors": [
+        "1"
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "1",
+      "title": "Introdução ao React Hooks",
+      "status": "published",
+      "publish_date": "2024-01-20",
+      "video_url": "https://youtube.com/watch?v=example1",
+      "course_id": "1",
+      "creator_id": "1"
+    },
+    {
+      "id": "2",
+      "title": "Context API e Estado Global",
+      "status": "published",
+      "publish_date": "2024-01-25",
+      "video_url": "https://youtube.com/watch?v=example2",
+      "course_id": "1",
+      "creator_id": "1"
+    },
+    {
+      "id": "3",
+      "title": "Testes com React Testing Library",
+      "status": "draft",
+      "publish_date": "2024-02-01",
+      "video_url": "https://youtube.com/watch?v=example3",
+      "course_id": "1",
+      "creator_id": "2"
+    }
+  ]
+} 
